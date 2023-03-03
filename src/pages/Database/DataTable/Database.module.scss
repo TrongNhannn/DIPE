@@ -1,0 +1,130 @@
+.sidebar {
+    position: fixed;
+    top: 50px;
+    margin-top: 15px;
+    bottom: 0;
+    margin-left: 5px;
+    z-index: 2;
+    width: 250px;
+    background: #fff;
+    box-shadow: 0 16px 38px -12px rgba(0, 0, 0, 0.56), 0 4px 25px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.2);
+    margin-bottom: 30px;
+    border-radius: 20px;
+  }
+  
+  .sidebar > .nav {
+    margin-top: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    padding-left: 0;
+    margin-bottom: 0;
+    list-style: none;
+  }
+  
+  .sidebar .nav .nav-item {
+    width: 100%;
+    margin-right: 12px;
+    margin-left: 12px;
+  }
+  
+  .sidebar .group-menu > li.active > a {
+    background-color: rgba(0, 172, 201, 0.92);
+    color: #fff;
+    box-shadow: 0 4px 20px 0px rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(156, 39, 176, 0.4);
+    height: 70px;
+  }
+  
+  .sidebar .nav li p {
+    margin: 0;
+    margin-left: 35px;
+    margin-top: 8px;
+  }
+  
+  .sidebar .nav li a {
+    border-radius: 15px !important;
+    color: #3C4858;
+    padding: 15px 10px;
+    text-transform: capitalize;
+    font-size: 16px;
+    
+  }
+
+  
+//     &:focus {
+//       background-color: rgb(238, 238, 238);
+//       text-decoration: none;
+//   }
+//   cursor: pointer;
+// }
+  
+  .main-panel {
+    position: fixed;
+    left: 250px;
+    top: 50px;
+    width: calc(100% - 250px);
+    transition: 0.33s, cubic-bezier(0.685, 0.0473, 0.346, 1);
+    padding: 15px 15px 0 15px;
+    display: inline-block;
+    min-height: calc(100vh - 70px);
+    background-color: #eef1f5;
+  }
+  
+  .main-panel.full {
+    left: 0;
+    width: 100%;
+  }
+
+  .nav > li > a {
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+
+    &:hover{
+      background-color: rgba(0, 172, 210, 0.95) !important;
+    }
+  }
+
+
+.nav {
+    padding-left: 0;
+    margin-bottom: 0;
+    list-style: none;
+}
+  
+  @media (max-width: 1440px) {
+    .sidebar {
+      width: 200px;
+    }
+    .main-panel {
+      left: 215px;
+      width: calc(100% - 230px);
+      padding: 0;
+    }
+    .sidebar .nav li a i {
+      font-size: 14px;
+      margin-right: 5px;
+    }
+    .sidebar .nav li a, .sidebar .nav li .dropdown-menu a {
+      font-size: 13px;
+      padding: 7px 5px;
+    }
+    .sidebar .nav .nav-item {
+      margin-left: 3px;
+      margin-right: 3px;
+      
+    }
+  }
+
+  @media (max-width: 540px) {
+    .sidebarmb {
+      width: 100px !important;
+      visibility: hidden !important;
+    }
+    .main-panelmb {
+      left: 0;
+      width: 100%;
+    }
+  }
+  
+
+  
