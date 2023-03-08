@@ -22,7 +22,7 @@ var table = require('./route/table');
 app.get('/api/get/the/god/damn/api/key/with/ridiculous/long/url/string', (req, res) => {
   res.send({ unique_string })
 })
-
+//test
 //Middleware
 const Auth = require('./Middleware/Auth');
 app.use(cors());
