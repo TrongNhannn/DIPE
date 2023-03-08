@@ -101,5 +101,30 @@ router.delete('/delete/:credential_string?', async (req, res) => {
         }
     });
 })
+
+router.put(`/prop/:credential_string`, (req, res) => {
+    const { key, value } = req.body;
+    const { credential_string } = req.params;
+    const query = `
+        UPDATE ACCOUNT_DETAIL SET ${ key } = '${ value }'
+            WHERE CREDENTIAL_STRING = '${credential_string}';
+    `;
+    mysql( query, result => {
+        res.status(200).send({ success: true })
+    })
+})
+router.put(`/:credential_string/changeava`, (req, res) => {
+    const { img } = req.body;
+    const { credential_string } = req.params;
+    cropIMG( img, credential_string, ({ success, avatar }) => {
+        const query = `
+            UPDATE ACCOUNT_DETAIL SET AVATAR = '${ avatar }'
+            WHERE CREDENTIAL_STRING = '${ credential_string }'
+        `;
+        mysql( query, result => {
+            res.send({  success: true })
+        })
+    })
+})
 module.exports = router;
 

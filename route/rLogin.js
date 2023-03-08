@@ -54,6 +54,11 @@ router.post('/create_user', async (req, res) => {
       'INSERT INTO accounts (account_string, pwd_string, account_status, credential_string, account_role ) VALUES (?, ?, ?, ?, ?)',
       [account_string, hashedPassword, account_status, credential_string, account_role]
     );
+
+    await connection.promise().query(
+      'INSERT INTO account_detail (credential_string, fullname, phone, email, address ) VALUES (?, ?, ?, ?, ?)',
+      [credential_string, fullname, phone, email, address]
+    );
     res.status(200).json({ success: true, content: 'Tài khoản đã được tạo thành công' });
   }
 });
