@@ -5,6 +5,22 @@ const { TableController } = require('../controller/table-controller');
 const { TablesController } = require('../controller/tables-controller');
 const { FieldController } = require('../controller/field-controller');
 const { ConstraintController } = require("../controller/constraint-controller")
+function checkdata(input) {
+  let valid = true;
+  if (input.length === 0) {
+    valid = false;
+  }
+  else {
+    const specialChars = [ " ", "*", "+" ]
+    for (let i = 0; i < input.length; i++) {
+      const char = input[i];
+      if ( specialChars.indexOf(char) !== -1 ) {
+        valid = false;
+      }
+    }
+  }
+  return valid;
+}
 // router.post('/modify', (req, res) => {
 //     const { table_id, table_name } = req.body;
 //     const Tables = new TablesController();
