@@ -33,23 +33,6 @@ router.get('/getall/:credential_string?', function (req, res) {
         });
     }
 });
-//@route POST api/auth/register
-//@desc Register user
-//@access Public
-// router.post('/register',function(req,res){
-//     try {
-//         User.addUser(req.body,function(err,count){
-
-//             if(err){ return res.status(500).json({ success: false, error: "Vui lòng nhập dữ liệu!" });
-//             } else{
-//                 return res.status(201).json({ data: count });
-//             }
-//         });
-//     } catch (error) {
-//        return res.status(500).json({success: false, message: error.message});
-//     }
-
-// });
 //@route POST api/user/active
 //@desc Update Role user
 //@access Public
@@ -105,7 +88,7 @@ router.delete('/delete/:credential_string', async (req, res) => {
         }
     });
 })
-
+//
 router.put(`/changeinfo/:credential_string`, (req, res) => {
     const { key, value } = req.body;
     const { credential_string } = req.params;
@@ -121,6 +104,7 @@ router.put(`/changeinfo/:credential_string`, (req, res) => {
         }
     })
 })
+//
 router.put(`/change/avatar/:credential_string`, (req, res) => {
     const { img } = req.body;
     const { credential_string } = req.params;

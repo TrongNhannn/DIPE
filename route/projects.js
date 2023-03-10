@@ -3,14 +3,14 @@ var router = express.Router();
 const mysqla = require('mysql2');
 const { mysql } = require('../Connect/conect');
 const { id } = require('../module/modulars');
+const { TablesController } = require('../controller/tables-controller');
+const e = require('express');
 const connection = mysqla.createConnection({
     host: 'localhost',
     user: 'nhan',
     password: 'root',
     database: 'dipe'
 });
-const { TablesController } = require('../controller/tables-controller');
-const e = require('express');
 function checkdata(input) {
     let valid = true;
     if (input.length === 0) {
@@ -29,8 +29,7 @@ function checkdata(input) {
 }
 const queryMultipleTime = (data, queries, index, callback) => {
 
-    if (index === queries.length) {
-        callback({ data });
+    if (index === queries.length) {  
     } else {
         const { name, query } = queries[index];
         mysql(query, (result) => {
@@ -258,7 +257,7 @@ router.get('/:project_id', (req, res) => {
             ]
 
             queryMultipleTime({}, queries, 0, ({ data }) => {
-                res.status(200).send({ success: true, content:"Thành công",data: { ...data, project } })
+                res.status(200).send({ success: true, content: "Thành công", data: { ...data, project } })
             })
 
         } else {
@@ -285,13 +284,12 @@ router.delete(`/delete/user/:project_id/:credential_string`, (req, res) => {
                 PROJECT_ID = ${project_id}
         `;
         mysql(query, result => {
-            if(result)
-            {
-                res.status(200).send({ success: true, content:"Xóa thành công"})
-            }else{
-                res.status(400).send({ success: false, content:"Xóa thất bại"})
+            if (result) {
+                res.status(200).send({ success: true, content: "Xóa thành công" })
+            } else {
+                res.status(400).send({ success: false, content: "Xóa thất bại" })
             }
-            
+
         })
     })
 })
@@ -304,23 +302,17 @@ router.post('/project/addpartners/user/:project_id', async (req, res) => {
     const partnerRawQueryString = [...partners, ...users].map(partner => {
         return `'${partner.credential_string}'`
     });
-
-    const partnerQueryString = partnerRawQueryString.join(',');    
-
-    console.log(partnerQueryString)
-
+    const partnerQueryString = partnerRawQueryString.join(',');
+    // console.log(partnerQueryString)
     const [existingUser] = await connection.promise().query(
-        `SELECT * FROM accounts WHERE credential_string in (${ partnerQueryString })`        
+        `SELECT * FROM accounts WHERE credential_string in (${partnerQueryString})`
     );
-
-
-    if (existingUser != undefined && existingUser.length > 0 ) {
-        const validAdmins = existingUser.filter( u => u.account_role == 'admin');
-        const partnersCredentialString = validAdmins.map(partner => {            
-            return `(${project_id}, '${partner.credential_string}')`                        
+    if (existingUser != undefined && existingUser.length > 0) {
+        const validAdmins = existingUser.filter(u => u.account_role == 'admin');
+        const partnersCredentialString = validAdmins.map(partner => {
+            return `(${project_id}, '${partner.credential_string}')`
         });
         const partnerTail = partnersCredentialString.join(", ");
-      
         queries.push(
             {
                 name: "partners",
@@ -328,9 +320,8 @@ router.post('/project/addpartners/user/:project_id', async (req, res) => {
             }
         );
     }
-
-    if (existingUser != undefined && existingUser.length > 0 ) {
-        const validUsers = existingUser.filter( u => u.account_role == 'user');
+    if (existingUser != undefined && existingUser.length > 0) {
+        const validUsers = existingUser.filter(u => u.account_role == 'user');
         const usersCredentialString = validUsers.map(user => {
             return `(${project_id}, '${user.credential_string}')`
         });
@@ -341,18 +332,14 @@ router.post('/project/addpartners/user/:project_id', async (req, res) => {
                 query: `INSERT INTO PROJECT_USER( PROJECT_ID, CREDENTIAL_STRING) VALUES ${userTail}`
             }
         );
-
-        console.log( queries )
-
-        queryMultipleTime({}, queries, 0, ({success, data }) => {
-            if(success){
-                  res.status(400).send({ success: false })
+        // console.log(queries)
+        queryMultipleTime({}, queries, 0, ({ success, data }) => {
+            if (success) {
+                res.status(400).send({ success: false })
             }
-            else 
-            {
-                res.status(200).send({ success: true, content:"Thêm thành công" })
+            else {
+                res.status(200).send({ success: true, content: "Thêm thành công" })
             }
-          
         })
     }
 });
@@ -381,7 +368,6 @@ router.post('/create', (req, res) => {
                     else {
                         res.status(400).send({ success: false, content: "Tạo project thất bại" })
                     }
-
                 })
             })
         } else {
@@ -392,14 +378,12 @@ router.post('/create', (req, res) => {
 /// tạo mới công việc cho dự án
 router.post('/tasks/create', (req, res) => {
     const { credential_string, project_id } = req.body;
-
     const query = `
         INSERT INTO TASKS( project_id, task_owner, task_state, task_label, task_description )
         VALUES( ${project_id}, '${credential_string}', 1, 'Yêu cầu mới', 'Mô tả yêu cầu' );
     `;
     mysql(query, result => {
         const task_id = result.insertId;
-
         const query = `
             SELECT * FROM TASKS AS T
                 INNER JOIN ACCOUNT_DETAIL AS AD
@@ -407,10 +391,9 @@ router.post('/tasks/create', (req, res) => {
                         INNER JOIN TASK_STATUS AS TS ON TS.STATUS_ID = T.TASK_STATE
             WHERE PROJECT_ID = ${project_id} AND TASK_ID = ${task_id};
         `;
-
         mysql(query, result => {
             const task = result[0];
-            res.send({ success: true,content:"Tạo thành công", task })
+            res.send({ success: true, content: "Tạo thành công", task })
         })
     })
 })
@@ -434,13 +417,10 @@ router.put('/tasks/modify', (req, res) => {
             `
         }
     })
-
     queryMultipleTime({}, [...queries, ...histories], 0, ({ data }) => {
-
-        res.status(200).send({ success: true })
+        res.status(200).send({ success: true, content:"Cập nhật thành công"})
     })
 })
-
 const getTableFields = (tables, index, callback) => {
     if (index === tables.length) {
         callback({ tablesDetail: tables })
@@ -461,7 +441,7 @@ const getTableFields = (tables, index, callback) => {
     }
 }
 ////xem version theo dự án
-router.get('/project/:project_id/ver/:version_id', (req, res) => {
+router.get('/project/:project_id/version/:version_id', (req, res) => {
     const { project_id, version_id } = req.params;
     const queries = [
         {
@@ -477,7 +457,6 @@ router.get('/project/:project_id/ver/:version_id', (req, res) => {
             `
         },
     ]
-
     queryMultipleTime({}, queries, 0, ({ data }) => {
         const tablesController = new TablesController()
         tablesController.getall_based_on_version_id(version_id, ({ success, tables }) => {
@@ -491,5 +470,4 @@ router.get('/project/:project_id/ver/:version_id', (req, res) => {
         })
     })
 })
-
 module.exports = router;

@@ -77,10 +77,9 @@ class TablesController {
         const query = `
             CALL table_add( "${table_name}", "${version_id}", "${table_alias}" );
         `;
-        // console.log(query);
+        console.log(query);
         mysql(query, result => {
             const { success, table_id } = result[0][0]
-
             if (success) {
                 callback({ success: true, table: new TableController({ table_id, table_name, table_alias, version_id }) }) /* Small bug need not to be hurry */
             }

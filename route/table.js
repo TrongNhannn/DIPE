@@ -6,20 +6,20 @@ const { TablesController } = require('../controller/tables-controller');
 const { FieldController } = require('../controller/field-controller');
 const { ConstraintController } = require("../controller/constraint-controller")
 function checkdata(input) {
-  let valid = true;
-  if (input.length === 0) {
-    valid = false;
-  }
-  else {
-    const specialChars = [ " ", "*", "+" ]
-    for (let i = 0; i < input.length; i++) {
-      const char = input[i];
-      if ( specialChars.indexOf(char) !== -1 ) {
+    let valid = true;
+    if (input.length === 0) {
         valid = false;
-      }
     }
-  }
-  return valid;
+    else {
+        const specialChars = [" ", "*", "+"]
+        for (let i = 0; i < input.length; i++) {
+            const char = input[i];
+            if (specialChars.indexOf(char) !== -1) {
+                valid = false;
+            }
+        }
+    }
+    return valid;
 }
 // router.post('/modify', (req, res) => {
 //     const { table_id, table_name } = req.body;
@@ -58,14 +58,14 @@ router.get('/:table_id/fields', (req, res) => {
                 if (success) {
                     const data = fields.map(field => field.get())
                     table.getConstraints(({ success, constraints }) => {
-                        res.status(200).send( { success: true, content: "Thành công", fields: data, constraints } )
+                        res.status(200).send({ success: true, content: "Thành công", fields: data, constraints })
                     })
                 } else {
-                    res.status(404).send( { success: false, content: "Thất bại" })
+                    res.status(404).send({ success: false, content: "Thất bại" })
                 }
             })
         } else {
-            res.status(404).send( { success: false, content: `Không tìm thấy bảng có ID: ${table_id} ` })
+            res.status(404).send({ success: false, content: `Không tìm thấy bảng có ID: ${table_id} ` })
         }
     })
 })
@@ -82,19 +82,18 @@ router.get('/:table_id/field/:field_id', (req, res) => {
         if (success) {
             table.getField(field_id, ({ success, field }) => {
                 if (success) {
-                    res.status(200).send( { success: true, content: "Thành công", field: field.get() })
+                    res.status(200).send({ success: true, content: "Thành công", field: field.get() })
                 } else {
-                    res.status(404).send( { success: false, content: `Không tìm thấy trường có ID: ${field_id}` })
+                    res.status(404).send({ success: false, content: `Không tìm thấy trường có ID: ${field_id}` })
                 }
             })
         } else {
-            res.status(404).send( { success: false, content: `Không tìm thấy bảng có ID: ${table_id} ` })
+            res.status(404).send({ success: false, content: `Không tìm thấy bảng có ID: ${table_id} ` })
         }
     })
 })
 // tạo mới trường + ràng buộc
 router.post('/create/field_constraint', (req, res) => {
-
     const { table_id } = req.body;
     const {
         field_name,
@@ -134,13 +133,12 @@ router.post('/create/field_constraint', (req, res) => {
                             res.status(200).json({ success: true, content: "Thêm thành công", data: field, constraint });
                         })
                     })
-
                 } else {
                     res.status(500).json({ success: true, content: "Thất bại" });
                 }
             })
         } else {
-            res.status(404).send( { success: false, content: `Không tìm thấy bảng có ID: ${table_id} ` })
+            res.status(404).send({ success: false, content: `Không tìm thấy bảng có ID: ${table_id} ` })
         }
     })
 })
@@ -167,7 +165,7 @@ router.post('/create/field', (req, res) => {
                 }
             })
         } else {
-            res.status(404).send( { success: false, content: `Không tìm thấy bảng có ID: ${table_id} ` })
+            res.status(404).send({ success: false, content: `Không tìm thấy bảng có ID: ${table_id} ` })
         }
     })
 })
@@ -178,12 +176,11 @@ router.delete('/field_drop/:field_id', (req, res) => {
     const field = new FieldController({ field_id })
     field.drop(({ success, content }) => {
         if (!success) {
-            res.status(200).send( { success: true, content: "Xóa trường thành công" });
+            res.status(404).send({ success: false, content: "Xóa trường thất bại" });
         }
-        else{
-              res.status(404).send( { success: false, content: "Xóa trường thất bại" });
+        else {
+            res.status(200).send({ success: true, content: "Xóa trường thành công" });
         }
-      
     });
 })
 //xem ràng buộc của bảng
@@ -200,13 +197,13 @@ router.get('/:table_id/constraints', (req, res) => {
             table.getConstraints(({ success, constraints }) => {
                 if (success) {
                     const data = constraints.map(constr => constr.get())
-                    res.status(200).send( { success: true, content: "Thành công", constraints: data })
+                    res.status(200).send({ success: true, content: "Thành công", constraints: data })
                 } else {
-                    res.status(200).send( { success: false, content: "Thất bại" })
+                    res.status(200).send({ success: false, content: "Thất bại" })
                 }
             })
         } else {
-            res.status(200).send( { success: false, content: `Không tìm thấy bảng có ID: ${table_id} ` })
+            res.status(200).send({ success: false, content: `Không tìm thấy bảng có ID: ${table_id} ` })
         }
     })
 })
@@ -256,34 +253,13 @@ router.delete('/dropall/constraints', (req, res) => {
     Tables.getone(criteria, ({ success, table }) => {
         if (success) {
             table.dropAllConstraints(({ success }) => {
-                res.status(200).send( { success, content: "Xóa tất cả ràng buộc thành công " })
+                res.status(200).send({ success, content: "Xóa tất cả ràng buộc thành công " })
             })
         } else {
-            res.status(200).send( { success: false, content: `Không tìm thấy bảng có ID: ${table_id} ` })
+            res.status(200).send({ success: false, content: `Không tìm thấy bảng có ID: ${table_id} ` })
         }
     })
 })
-///// xóa bảng
-// router.delete('/drop/:table_id', (req, res) => {
-
-//     const { table_id } = req.params;
-
-//     const Tables = new TablesController();
-//     const criteria = [{
-//         field: "table_id",
-//         value: table_id,
-//         fomula: "="
-//     }]
-//     Tables.getone(criteria, ({ success, table }) => {
-//         if (success) {
-//             table.drop(({ success }) => {
-//                 res.send({ success: true, content: "Xóa thành công " })
-//             })
-//         } else {
-//             res.send({ success: false, content: `Không tìm thấy bảng có ID: ${table_id}` })
-//         }
-//     })
-// })
 
 ///// Xóa ràng 1 buộcc
 router.delete('/drop_id/constraints', (req, res) => {
@@ -304,15 +280,15 @@ router.delete('/drop_id/constraints', (req, res) => {
                     constraint.drop(({ success, content }) => {
                         // console.log(success, content);
                         if (success) {
-                            res.status(200).send( { success: true, content: "Xóa ràng buộc thành công" })
+                            res.status(200).send({ success: true, content: "Xóa ràng buộc thành công" })
                         } else {
-                            res.status(200).send( { success: false, content: "Xóa ràng buộc thất bại" });
+                            res.status(200).send({ success: false, content: "Xóa ràng buộc thất bại" });
                         }
                     });
                 }
             })
         } else {
-            res.status(200).send( { success: false, content: "Không tìm thấy bảng" })
+            res.status(200).send({ success: false, content: "Không tìm thấy bảng" })
         }
     })
 })
@@ -346,14 +322,14 @@ router.put('/modify/constraint', (req, res) => {
                         check_on_field,
                         default_check_value
                     }, ({ success, constraint }) => {
-                        res.status(200).send( { success: true, content: "Thành công", data: constraint.get() })
+                        res.status(200).send({ success: true, content: "Thành công", data: constraint.get() })
                     })
                 } else {
-                    res.status(404).send( { success: false, content: "Không tìm thấy ràng buộc" })
+                    res.status(404).send({ success: false, content: "Không tìm thấy ràng buộc" })
                 }
             })
         } else {
-            res.status(404).send( { success: false, content: `Không tìm thấy bảng có ID: ${table_id} ` })
+            res.status(404).send({ success: false, content: `Không tìm thấy bảng có ID: ${table_id} ` })
         }
     })
 })
@@ -368,7 +344,9 @@ router.put('/modify/field', (req, res) => {
         field_data_type,
         default_value
     } = req.body;
+
     console.log(req.body);
+
     const Tables = new TablesController();
     const criteria = [{
         field: "table_id",
@@ -382,18 +360,18 @@ router.put('/modify/field', (req, res) => {
                     field.modify({
                         field_name,
                         nullable,
-                        field_props,
+                        field_props: JSON.parse(field_props),
                         field_data_type,
                         default_value
                     }, ({ success, content, field }) => {
-                        res.status(200).send( { success: true, content: "Thành công", field: field.get() })
+                        res.status(200).send({ success: true, content: "Thành công", field: field.get() })
                     })
                 } else {
                     res.status(404).send({ success: false, content: `Không tìm thấy trường có ID: ${field_id} ` })
                 }
             })
         } else {
-            res.status(404).send( { success: false, content: `Không tìm thấy bảng có ID: ${table_id} ` })
+            res.status(404).send({ success: false, content: `Không tìm thấy bảng có ID: ${table_id} ` })
         }
     })
 })

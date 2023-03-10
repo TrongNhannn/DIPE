@@ -36,7 +36,7 @@ app.get('/api/get/the/god/damn/api/key/with/ridiculous/long/url/string', (req, r
 //Middleware
 const Auth = require('./Middleware/Auth');
 app.use(cors());
-//Token
+//Token0
 app.use('/token', tk);
 //Middleware
 // app.use(Auth.isAuth);
