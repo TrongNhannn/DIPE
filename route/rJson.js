@@ -1,14 +1,14 @@
 const express = require('express');
 const router = express.Router()
-const { mongo } = require('../Connect/Dbconnection');
+const { mongo } = require('../Connect/conect.js');
 
 router.get(`/all`, (req, res) => {
     mongo((dbo) => {
-        dbo.collection('json').find().toArray((err, result) => {
+        dbo.collection('id1678410529620').find().toArray((err, result) => {
             if (result.length !== 0) {
-                res.send(200, { success: true, pages: result })
+                res.status(200).send({ success: true, pages: result })
             } else {
-                res.send(404, { success: false, pages: "No pages can be found!" })
+                res.status(404).send( { success: false, pages: "No pages can be found!" })
             }
         })
     })
@@ -23,9 +23,9 @@ router.get(`/:page_id`, (req, res) => {
             }
             else {
                 if (result.length !== 0) {
-                    res.send(200, { success: true, page: result })
+                    res.status(200).send({ success: true, page: result })
                 } else {
-                    res.send(404, { success: false, page: "No page can be found!" })
+                    res.status(404).send({ success: false, page: "No page can be found!" })
                 }
             }
         })
@@ -36,7 +36,8 @@ router.post(`/add`, (req, res) => {
     const { data } = req.body;
     console.log(data)
     mongo((dbo) => {
-        dbo.collection("json").insertOne(data, (err, result) => {
+        console.log(dbo)
+        dbo.collection("jsondata").insertOne(data, (err, result) => {
             res.send({ success: true, content: "SUCCESSFULY INSERTED A NEW PAGE" })
         })
     })
@@ -61,7 +62,7 @@ router.put(`/update/:page_id`, (req, res) => {
                         res.send({ success: false })
                     }
                     else {
-                        res.send(200, { success: true, page: result })
+                        res.status(200).send({ success: true, page: result })
                     }
                 });
         });
@@ -84,7 +85,7 @@ router.delete(`/delete/:page_id`, (req, res) => {
                         res.send({ success: false })
                     }
                     else {
-                        res.send(200, { success: true, page: result })
+                        res.status(200).send( { success: true, page: result })
                     }
                 });
         });

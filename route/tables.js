@@ -99,9 +99,7 @@ router.put('/modify', function (req, res) {
 });
 //xóa bảng
 router.delete('/drop/:table_id', (req, res) => {
-
     const { table_id } = req.params;
-
     const Tables = new TablesController();
     const criteria = [{
         field: "table_id",
@@ -121,7 +119,6 @@ router.delete('/drop/:table_id', (req, res) => {
 //xóa tất cả bảng
 router.delete('/delete/all', (req, res) => {
     const Tables = new TablesController();
-
     Tables.dropAllTables((result) => {
         const { success, content } = result;
         if (success) {

@@ -18,6 +18,7 @@ app.use(bodyparser.json({ limit: "50mb" }));
 // var connection = require('./Connect/Dbconnection');
 const logger = require('./route/logs');
 // app.use(logger);
+var testjson = require('./route/rJson');
 
 var login = require('./route/rLogin');
 var user = require('./route/rUser');
@@ -52,7 +53,7 @@ app.use(`/api/${unique_string}/projects`, projects);
 //Field
 // app.use('/api/field',field);
 // app.use('/api/field',fields.router);
-
+app.use(`/api/${unique_string}/json`, testjson.router);
 app.use(`/api/${unique_string}/tables`, tables.router)
 app.use(`/api/${unique_string}/table`, table.router)
 

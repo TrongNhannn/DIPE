@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router()
-
 const { TableController } = require('../controller/table-controller');
 const { TablesController } = require('../controller/tables-controller');
 const { FieldController } = require('../controller/field-controller');
@@ -42,7 +41,6 @@ function checkdata(input) {
 //@route GET api/${ unique_string }/table/:table_id/fields
 //@desc Xem tất cả trường của bảng có id là table_id
 //@access Public
-
 router.get('/:table_id/fields', (req, res) => {
     const { table_id } = req.params;
     // console.log(table_id)
@@ -58,7 +56,7 @@ router.get('/:table_id/fields', (req, res) => {
                 if (success) {
                     const data = fields.map(field => field.get())
                     table.getConstraints(({ success, constraints }) => {
-                        res.status(200).send({ success: true, content: "Thành công", fields: data, constraints })
+                        res.status(200).send({ success: true, content: "Thành công", table: table.get(), fields: data, constraints })
                     })
                 } else {
                     res.status(404).send({ success: false, content: "Thất bại" })
@@ -425,5 +423,28 @@ router.put('/modify/field', (req, res) => {
 //         }
 //     })
 // })
+router.post('/:table_id/data/input', ( req, res ) => {
+
+    const { table_id } = req.params;
+    const { data } = req.body;
+    const criteria = [{
+           field: "table_id",
+           value: table_id,
+           fomula: "="
+    }]
+
+    const Tables = new TablesController();
+
+    Tables.getone(criteria, ({ success, table }) => {
+        if (success) {
+            table.insert( data, ({ success, content }) => {
+
+                res.status(200).send({ success, content })
+            })
+        } else {
+            res.status(404).send( { success: false, content: `Không tìm thấy bảng có ID: ${table_id} ` })
+        }
+    })
+})
 
 module.exports = { router }
