@@ -5,7 +5,7 @@ const { mysql } = require('../Connect/conect');
 const { id } = require('../module/modulars');
 const { TablesController } = require('../controller/tables-controller');
 const e = require('express');
-
+const moment = require('moment');
 const connection = mysqla.createConnection({
     host: 'localhost',
     user: 'nhan',
@@ -79,7 +79,7 @@ const getProjectDetailInfor = (projects, index, callback) => {
     }
 }
 /// getall project
-router.get('/all', (req, res) => {
+router.get('/getall', (req, res) => {
     const query = `
     SELECT * FROM PROJECTS AS P
         INNER JOIN PROJECT_STATUS AS PS ON PS.STATUS_ID = P.PROJECT_STATUS
@@ -344,8 +344,72 @@ router.post('/project/addpartners/user/:project_id', async (req, res) => {
         })
     }
 });
+
+router.post('/create/template', (req, res) => {
+    const { template, current } = req.body;
+    const today = new Date();
+    const date = today.getDate();
+    const month = today.getMonth() + 1;
+    const year = today.getFullYear();
+    const number = 111;
+
+    let result = template;
+    result = result.replace("[DD]", date);
+    result = result.replace("[MM]", month);
+    result = result.replace("[YYYY]", year);
+
+    const numberPlaces = [];
+    for (let i = 0; i < result.length; i++) {
+        if (result[i] === '[') {
+            var temp = ""
+            for (let j = i + 1; j < result.length; j++) {
+                if (result[j] === 'N' && result[j] !== ']') {
+                    temp += result[j];
+                } else {
+                    if (result[j] === ']') {
+                        numberPlaces.push(temp);
+                        i = j;
+                        temp = ""
+                    }
+                }
+            }
+        }
+    }
+    const places = numberPlaces.map(place => {
+        const placeLength = place.length;
+        numberLength = number.toString().length;
+        let header = "";
+        for (let i = 0; i < placeLength; i++) {
+            header += "0";
+        }
+        console.log(placeLength)
+        const result = header.slice(0, placeLength - numberLength) + number.toString();
+        return { place, value: result };
+
+    })
+    for (let i = 0; i < places.length; i++) {
+        const { place, value } = places[i];
+        console.log({ place, value })
+        result = result.replace(`[${place}]`, value)
+    }
+    res.send(200, { result });
+    //     const a = numberPlaces[0].length;
+    //     console.log(a);
+    //     var dem = 0;
+    //     for (let i = 0; i < a; i++) {
+    //         if (i < a - number.toString().length) {
+    //             dem += 0;
+    //              numberPlaces[i] = number.toString()[dem]
+    //         }
+    //     }
+    //     console.log(numberPlaces);
+    //    result = result.replace(`[${numberPlaces}]`,number );
+    
+
+})
 //// Tạo mới Project
 router.post('/create', (req, res) => {
+
     const { project } = req.body;
     const { project_name, project_master, description } = project;
     const query = `CALL CREATE_PROJECT('${project_name}', 'PJ${id().toUpperCase()}', '${project_master.credential_string}', '${description}')`;
@@ -463,12 +527,27 @@ router.get('/project/:project_id/version/:version_id', (req, res) => {
         tablesController.getall_based_on_version_id(version_id, ({ success, tables }) => {
             if (success) {
                 getTableFields(tables, 0, ({ tablesDetail }) => {
-                    res.send({ success: true, tablesDetail, data })
+                    if (tablesDetail.length > 0) {
+                        res.send({ success: true, tablesDetail, data })
+                    } else {
+                        res.send({ success: false })
+                    }
+
                 })
             } else {
                 res.send({ success: true, tablesDetail: [], data })
             }
         })
     })
+});
+//thêm version
+router.get('/project/version/test', (req, res) => {
+    // CP[DD][MM]
+    const str1 = "Hello";
+    const str2 = "World!";
+    const concatStr = str1.concat(" ", str2); // "Hello World!"
+    const templateStr = `${str1} ${str2}`; // "Hello World!"
+    console.log(templateStr)
+
 });
 module.exports = router;
