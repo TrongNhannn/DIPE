@@ -5,6 +5,10 @@ const { mysql } = require('../Connect/conect');
 const { id } = require('../module/modulars');
 const { TablesController } = require('../controller/tables-controller');
 const e = require('express');
+
+
+
+
 const connection = mysqla.createConnection({
     host: 'localhost',
     user: 'nhan',
@@ -27,26 +31,27 @@ function checkdata(input) {
     }
     return valid;
 }
-const queryMultipleTime = (data, queries, index, callback) => {
+const queryMultipleTime = ( data, queries, index, callback ) => {
 
-    if (index === queries.length) {  
-    } else {
-        const { name, query } = queries[index];
-        mysql(query, (result) => {
-            if (result != undefined && result.length > 0) {
+    if( index === queries.length ){
+        callback( { data } );
+    }else{
+        const { name, query } = queries[ index ];
+        mysql( query, ( result ) => {
+            if( result != undefined &&  result.length > 0 ){
                 data[name] = result;
-            } else {
+            }else{
                 data[name] = []
             }
-            queryMultipleTime(data, queries, index + 1, callback)
+            queryMultipleTime( data, queries, index + 1, callback )
         })
     }
 }
 
-const getProjectDetailInfor = (projects, index, callback) => {
-    if (index === projects.length) {
+const getProjectDetailInfor = ( projects, index, callback ) => {
+    if( index === projects.length ){
         callback({ projectDetails: projects })
-    } else {
+    }else{
         const project = projects[index];
 
         const { project_id } = project;
@@ -57,7 +62,7 @@ const getProjectDetailInfor = (projects, index, callback) => {
                 query: `
                 SELECT * FROM ACCOUNT_DETAIL AS AD
                     INNER JOIN PROJECT_PARTNER AS PP ON PP.CREDENTIAL_STRING = AD.CREDENTIAL_STRING
-                WHERE PROJECT_ID = ${project_id};
+                WHERE PROJECT_ID = ${ project_id };
                 `
             },
             {
@@ -65,20 +70,21 @@ const getProjectDetailInfor = (projects, index, callback) => {
                 query: `
                 SELECT * FROM TASKS AS T INNER JOIN ACCOUNT_DETAIL AS AD
                     ON AD.CREDENTIAL_STRING = T.TASK_OWNER
-                WHERE PROJECT_ID = ${project_id}
+                WHERE PROJECT_ID = ${ project_id }
                 ORDER BY CHANGE_AT DESC;
                 `
             },
         ]
 
-        queryMultipleTime(project, queries, 0, ({ data }) => {
+        queryMultipleTime( project, queries, 0, ({ data }) => {
             projects[index] = data;
-            getProjectDetailInfor(projects, index + 1, callback)
+            getProjectDetailInfor( projects, index + 1, callback )
         })
     }
 }
+
 /// getall project
-router.get('/', (req, res) => {
+router.get('/all', (req, res) => {
     const query = `
     SELECT * FROM PROJECTS AS P
         INNER JOIN PROJECT_STATUS AS PS ON PS.STATUS_ID = P.PROJECT_STATUS
@@ -161,7 +167,7 @@ router.get('/projectofuser/:credential_string', (req, res) => {
     getMultipleProjectTypeInfo(queries, 0, {}, ({ context }) => {
         res.status(200).send({ projects: context })
     })
-})
+});
 /// get project theo ID
 router.get('/:project_id', (req, res) => {
     const { project_id } = req.params;
@@ -292,7 +298,7 @@ router.delete(`/delete/user/:project_id/:credential_string`, (req, res) => {
 
         })
     })
-})
+});
 
 /// thêm người dùng vào project
 router.post('/project/addpartners/user/:project_id', async (req, res) => {
@@ -374,7 +380,7 @@ router.post('/create', (req, res) => {
             res.status(400).send({ success: false, content: "Tạo project thất bại" })
         }
     })
-})
+});
 /// tạo mới công việc cho dự án
 router.post('/tasks/create', (req, res) => {
     const { credential_string, project_id } = req.body;
@@ -396,7 +402,7 @@ router.post('/tasks/create', (req, res) => {
             res.send({ success: true, content: "Tạo thành công", task })
         })
     })
-})
+});
 ///Chỉnh sửa công việc của dự án
 router.put('/tasks/modify', (req, res) => {
     const { changes, credential_string, task_id } = req.body;
@@ -418,9 +424,9 @@ router.put('/tasks/modify', (req, res) => {
         }
     })
     queryMultipleTime({}, [...queries, ...histories], 0, ({ data }) => {
-        res.status(200).send({ success: true, content:"Cập nhật thành công"})
+        res.status(200).send({ success: true, content: "Cập nhật thành công" })
     })
-})
+});
 const getTableFields = (tables, index, callback) => {
     if (index === tables.length) {
         callback({ tablesDetail: tables })
@@ -469,5 +475,5 @@ router.get('/project/:project_id/version/:version_id', (req, res) => {
             }
         })
     })
-})
+});
 module.exports = router;

@@ -3,7 +3,7 @@ const ConstraintController = require('../controller/constraint-controller');
 class FieldController {
     constructor(field_object) {
         const { field_id, field_name, field_alias, nullable, field_props, field_data_type, default_value } = field_object;
-
+        
         this.field_id = field_id;
         this.field_name = field_name;
         this.field_alias = field_alias;
@@ -41,8 +41,8 @@ class FieldController {
         `;
         console.log(query)
         mysql(query, (result) => {
-          
-            callback({ success: true , content:"Success"})
+
+            callback({ success: true, content: "Success" })
         })
     }
 

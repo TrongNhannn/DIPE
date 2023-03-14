@@ -16,10 +16,10 @@ function checkdata(input) {
     valid = false;
   }
   else {
-    const specialChars = [ " ", "*", "+" ]
+    const specialChars = [" ", "*", "+"]
     for (let i = 0; i < input.length; i++) {
       const char = input[i];
-      if ( specialChars.indexOf(char) !== -1 ) {
+      if (specialChars.indexOf(char) !== -1) {
         valid = false;
       }
     }
@@ -28,7 +28,7 @@ function checkdata(input) {
 }
 // Đăng ký tài khoản người dùng mới
 router.post('/create_user', async (req, res) => {
-    /* Thêm account_role vào body vì đã chia ra thêm một role mới là su ( stands for super user ) */
+  /* Thêm account_role vào body vì đã chia ra thêm một role mới là su ( stands for super user ) */
   const { user } = req.body;
   const { account_string, pwd_string, account_role, fullname, email, phone, address } = user;
   if (!checkdata(account_string)) {

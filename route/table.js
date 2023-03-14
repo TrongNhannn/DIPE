@@ -4,6 +4,9 @@ const { TableController } = require('../controller/table-controller');
 const { TablesController } = require('../controller/tables-controller');
 const { FieldController } = require('../controller/field-controller');
 const { ConstraintController } = require("../controller/constraint-controller")
+const { mysql } = require('../Connect/conect');
+
+
 function checkdata(input) {
     let valid = true;
     if (input.length === 0) {
@@ -121,7 +124,6 @@ router.post('/create/field_constraint', (req, res) => {
                 if (success) {
                     field.createConstraint({
                         constraint_type,
-
                         reference_on,
                         check_fomular,
                         check_on_field,              /*---*/
@@ -205,6 +207,28 @@ router.get('/:table_id/constraints', (req, res) => {
         }
     })
 })
+/// chọn ra bảng theo field_id
+router.get('/foreign/data/:field_id', (req, res) => {
+    const { field_id } = req.params;
+
+    const query = `
+        SELECT * FROM tables WHERE
+            TABLE_ID IN (
+                SELECT table_id FROM fields WHERE field_id = ${field_id}
+            )
+    `;
+    mysql(query, (result) => {
+        if (result.length > 0) {
+            const table = new TableController(result[0]);
+            table.findAll(({ success, data }) => {
+                res.status(200).send({ success, data, table: table.get() });
+            })
+        } else {
+            res.send({ success: false })
+        }
+    })
+})
+
 //tạo ràng buộc cho bảng
 router.post('/constraint', (req, res) => {
     const { table_id } = req.body;
@@ -343,7 +367,7 @@ router.put('/modify/field', (req, res) => {
         default_value
     } = req.body;
 
-    console.log(req.body);
+    // console.log(req.body);
 
     const Tables = new TablesController();
     const criteria = [{
@@ -423,26 +447,26 @@ router.put('/modify/field', (req, res) => {
 //         }
 //     })
 // })
-router.post('/:table_id/data/input', ( req, res ) => {
+router.post('/:table_id/data/input', (req, res) => {
 
     const { table_id } = req.params;
     const { data } = req.body;
     const criteria = [{
-           field: "table_id",
-           value: table_id,
-           fomula: "="
+        field: "table_id",
+        value: table_id,
+        fomula: "="
     }]
 
     const Tables = new TablesController();
 
     Tables.getone(criteria, ({ success, table }) => {
         if (success) {
-            table.insert( data, ({ success, content }) => {
+            table.insert(data, ({ success, content }) => {
 
                 res.status(200).send({ success, content })
             })
         } else {
-            res.status(404).send( { success: false, content: `Không tìm thấy bảng có ID: ${table_id} ` })
+            res.status(404).send({ success: false, content: `Không tìm thấy bảng có ID: ${table_id} ` })
         }
     })
 })

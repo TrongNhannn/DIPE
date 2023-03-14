@@ -7,11 +7,11 @@ const morgan = require('morgan');
 require('dotenv').config();
 
 app.use(bodyparser.urlencoded({
-    limit: "50mb",
-    extended: false,
+  limit: "50mb",
+  extended: false,
 }));
 
-app.use( express.static('public') );
+app.use(express.static('public'));
 
 app.use(bodyparser.json({ limit: "50mb" }));
 // app.use(morgan('combined'));

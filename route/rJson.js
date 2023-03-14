@@ -8,7 +8,7 @@ router.get(`/all`, (req, res) => {
             if (result.length !== 0) {
                 res.status(200).send({ success: true, pages: result })
             } else {
-                res.status(404).send( { success: false, pages: "No pages can be found!" })
+                res.status(404).send({ success: false, pages: "No pages can be found!" })
             }
         })
     })
@@ -85,7 +85,7 @@ router.delete(`/delete/:page_id`, (req, res) => {
                         res.send({ success: false })
                     }
                     else {
-                        res.status(200).send( { success: true, page: result })
+                        res.status(200).send({ success: true, page: result })
                     }
                 });
         });

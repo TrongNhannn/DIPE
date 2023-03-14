@@ -122,7 +122,7 @@ router.delete('/delete/all', (req, res) => {
     Tables.dropAllTables((result) => {
         const { success, content } = result;
         if (success) {
-            res.status(200).send( { success, content })
+            res.status(200).send({ success, content })
         }
     })
 })
