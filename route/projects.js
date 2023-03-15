@@ -6,11 +6,11 @@ const { id } = require('../module/modulars');
 const { TablesController } = require('../controller/tables-controller');
 const e = require('express');
 const moment = require('moment');
-const connection = mysqla.createConnection({
-    host: 'localhost',
-    user: 'nhan',
-    password: 'root',
-    database: 'dipe'
+var connection = mysqla.createConnection({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME
 });
 function checkdata(input) {
     let valid = true;
@@ -49,9 +49,7 @@ const getProjectDetailInfor = (projects, index, callback) => {
         callback({ projectDetails: projects })
     } else {
         const project = projects[index];
-
         const { project_id } = project;
-
         const queries = [
             {
                 name: "partners",
@@ -71,7 +69,6 @@ const getProjectDetailInfor = (projects, index, callback) => {
                 `
             },
         ]
-
         queryMultipleTime(project, queries, 0, ({ data }) => {
             projects[index] = data;
             getProjectDetailInfor(projects, index + 1, callback)
@@ -166,7 +163,6 @@ router.get('/projectofuser/:credential_string', (req, res) => {
 /// get project theo ID
 router.get('/:project_id', (req, res) => {
     const { project_id } = req.params;
-
     const query = `
         SELECT *
         FROM PROJECTS AS P
@@ -176,7 +172,6 @@ router.get('/:project_id', (req, res) => {
     mysql(query, result => {
         if (result != undefined && result.length > 0) {
             const project = result[0];
-
             const queries = [
                 {
                     name: "owner",
@@ -191,7 +186,6 @@ router.get('/:project_id', (req, res) => {
                             )
                     `
                 },
-
                 {
                     name: "partners",
                     query: `
@@ -205,7 +199,6 @@ router.get('/:project_id', (req, res) => {
                             )
                     `
                 },
-
                 {
                     name: "users",
                     query: `
@@ -219,7 +212,6 @@ router.get('/:project_id', (req, res) => {
                             )
                     `
                 },
-
                 {
                     name: "versions",
                     query: `
@@ -256,7 +248,6 @@ router.get('/:project_id', (req, res) => {
                     `
                 },
             ]
-
             queryMultipleTime({}, queries, 0, ({ data }) => {
                 res.status(200).send({ success: true, content: "Thành công", data: { ...data, project } })
             })
@@ -277,7 +268,6 @@ router.delete(`/delete/user/:project_id/:credential_string`, (req, res) => {
             PROJECT_ID = ${project_id}
     `;
     mysql(query, result => {
-
         const query = `
             DELETE FROM PROJECT_USER
             WHERE
@@ -333,7 +323,6 @@ router.post('/project/addpartners/user/:project_id', async (req, res) => {
                 query: `INSERT INTO PROJECT_USER( PROJECT_ID, CREDENTIAL_STRING) VALUES ${userTail}`
             }
         );
-        // console.log(queries)
         queryMultipleTime({}, queries, 0, ({ success, data }) => {
             if (success) {
                 res.status(400).send({ success: false })
@@ -357,7 +346,6 @@ router.post('/create/template', (req, res) => {
     result = result.replace("[DD]", date);
     result = result.replace("[MM]", month);
     result = result.replace("[YYYY]", year);
-
     const numberPlaces = [];
     for (let i = 0; i < result.length; i++) {
         if (result[i] === '[') {
@@ -385,7 +373,6 @@ router.post('/create/template', (req, res) => {
         console.log(placeLength)
         const result = header.slice(0, placeLength - numberLength) + number.toString();
         return { place, value: result };
-
     })
     for (let i = 0; i < places.length; i++) {
         const { place, value } = places[i];
@@ -393,19 +380,6 @@ router.post('/create/template', (req, res) => {
         result = result.replace(`[${place}]`, value)
     }
     res.send(200, { result });
-    //     const a = numberPlaces[0].length;
-    //     console.log(a);
-    //     var dem = 0;
-    //     for (let i = 0; i < a; i++) {
-    //         if (i < a - number.toString().length) {
-    //             dem += 0;
-    //              numberPlaces[i] = number.toString()[dem]
-    //         }
-    //     }
-    //     console.log(numberPlaces);
-    //    result = result.replace(`[${numberPlaces}]`,number );
-    
-
 })
 //// Tạo mới Project
 router.post('/create', (req, res) => {
@@ -532,7 +506,6 @@ router.get('/project/:project_id/version/:version_id', (req, res) => {
                     } else {
                         res.send({ success: false })
                     }
-
                 })
             } else {
                 res.send({ success: true, tablesDetail: [], data })
@@ -540,14 +513,35 @@ router.get('/project/:project_id/version/:version_id', (req, res) => {
         })
     })
 });
-//thêm version
-router.get('/project/version/test', (req, res) => {
-    // CP[DD][MM]
-    const str1 = "Hello";
-    const str2 = "World!";
-    const concatStr = str1.concat(" ", str2); // "Hello World!"
-    const templateStr = `${str1} ${str2}`; // "Hello World!"
-    console.log(templateStr)
 
+router.post('/project/version/create', (req, res) => {
+    const { publisher, project_id, version_name, descriptions } = req.body;
+    const query = `
+        INSERT INTO VERSIONS( project_id, version_name, publisher,descriptions )
+        VALUES( ${project_id}, '${version_name}', '${publisher}','${descriptions}');
+    `;
+    mysql(query, result => {
+        if (result) {
+            res.send({ success: true, content: "Tạo thành công", data: result })
+        }
+        else {
+            res.send({ success: false, content: "Thêm version thất bại" })
+        }
+    })
+});
+//
+router.put('/project/version/modify', (req, res) => {
+    const { version_id, version_name, descriptions } = req.body;
+    const query = `
+    UPDATE versions SET version_name = '${version_name}',descriptions='${descriptions}' WHERE version_id = ${version_id}
+    `;
+    mysql(query, result => {
+        if (result) {
+            res.send({ success: true, content: "Cập nhật thành công", data: result })
+        }
+        else {
+            res.send({ success: false, content: "Cập nhật version thất bại" })
+        }
+    })
 });
 module.exports = router;

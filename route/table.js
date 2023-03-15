@@ -56,6 +56,7 @@ router.get('/:table_id/fields', (req, res) => {
     Tables.getone(criteria, ({ success, table }) => {
         if (success) {
             table.getFields(({ success, fields }) => {
+               
                 if (success) {
                     const data = fields.map(field => field.get())
                     table.getConstraints(({ success, constraints }) => {

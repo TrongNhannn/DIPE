@@ -133,7 +133,6 @@ class TableController {
         const query = `
                 CALL add_constraint('${constraint_type}', ${field_id}, '${reference_on ? reference_on : -1}', '${check_fomular}', ${check_on_field}, '${default_check_value ? default_check_value : "NULL"}');
             `;
-
         mysql(query, (result) => {
             const { success, content, id } = result[0][0];
             if (success) {
