@@ -5,7 +5,6 @@ const { mysql } = require('../Connect/conect');
 const { id } = require('../module/modulars');
 const { TablesController } = require('../controller/tables-controller');
 const e = require('express');
-const moment = require('moment');
 var connection = mysqla.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -84,7 +83,6 @@ router.get('/getall', (req, res) => {
     `;
     mysql(query, (result) => {
         const projects = result;
-
         getProjectDetailInfor(projects, 0, ({ projectDetails }) => {
             if (projectDetails.length !== 0) {
                 res.status(200).send({ success: true, content: "Danh sách các dự án", projectDetails })
@@ -341,7 +339,6 @@ router.post('/create/template', (req, res) => {
     const month = today.getMonth() + 1;
     const year = today.getFullYear();
     const number = 111;
-
     let result = template;
     result = result.replace("[DD]", date);
     result = result.replace("[MM]", month);

@@ -2,20 +2,20 @@ const express = require('express');
 const router = express.Router()
 const Table = require('../Model/Table');
 const { TablesController } = require('../controller/tables-controller');
- const { v4: uuidv4 } = require('uuid');
+
+//
+// const { v4: uuidv4 } = require('uuid');
+// function createUniqueURL(baseURL) {
+//     const uniqueID = uuidv4();
+//     return `${baseURL}/${uniqueID}`;
+//   }
+//   const baseURL = 'https://example.com';
+//   const uniqueURL = createUniqueURL(baseURL);
+//   console.log(uniqueURL)
+
 //@route GET api/${ unique_string }/tables/getall
 //@desc Xem tất cả các bảng
-
 router.get('/getall', (req, res) => {
-   
-
-function createUniqueURL(baseURL) {
-  const uniqueID = uuidv4();
-  return `${baseURL}/${uniqueID}`;
-}
-const baseURL = 'https://example.com';
-const uniqueURL = createUniqueURL(baseURL);
-console.log(uniqueURL)
     const Tables = new TablesController();
     Tables.getall(({ success, tables }) => {
         if (success) {
