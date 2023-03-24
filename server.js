@@ -54,8 +54,28 @@ app.use(`/api/${unique_string}/table`, table.router);
 // app.use(`/api/${unique_string}/rfid`, rfids.router);
 
 app.use((req, res, next) => {
-  res.status(404).send("404 - Page not found");
+  const { url } = req;
+
+  const splitted = url.split('/')[4]
+
+  mongo( dbo => {
+      dbo.collection('apis').findOne({ "url.id_str": splitted }, (err, result) => {
+          const api = result;
+          if( api && api.status ){
+              apiResolving(req, api, ( { data } )=> {
+                  res.status(200).send({ success: true, data })
+              })
+          }else{
+              res.status(404).send({ success: false, content: "404 page not found" })
+          }
+      })
+  })
 })
+
+
+
+
+
 var server = app.listen(process.env.PORT, function () {
   console.log('Server listening on port ' + server.address().port);
 });
